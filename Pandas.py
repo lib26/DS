@@ -42,6 +42,7 @@ print(df.fillna(100))
 print(df.fillna(df.mean()))
 print(df.fillna(df.median()))
 print()
+print()
 
 # ffill, bfill
 print("---------fillna(ffill/bfill)---------")
