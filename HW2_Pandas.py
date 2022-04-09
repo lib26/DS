@@ -2,7 +2,10 @@ import pandas as pd
 import numpy as np
 
 # create Panda (4,4)  (3. ? 2. 5. * 4. 5. 6. + 3. 2. & 5. ? 7. !)
-df = pd.DataFrame({'a':[3.,'?', 2., 5.], 'b':['*', 4., 5., 6.], 'c':['+', 3., 2., '&'], 'd': [5., '?', 7, '!']})
+df = pd.DataFrame({'a':[3.,'?', 2., 5.],
+                   'b':['*', 4., 5., 6.],
+                   'c':['+', 3., 2., '&'],
+                   'd': [5., '?', 7, '!']})
 print()
 
 # Display the DataFrame

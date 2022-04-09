@@ -2,6 +2,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 import random
 
+arr = np.arange(4)
+r = arr[:,np.newaxis]
+print(r)
+
 #[Ex-1]
 WT = []
 HT = []
