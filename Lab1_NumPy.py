@@ -2,17 +2,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 import random
 
-arr = np.arange(4)
-r = arr[:,np.newaxis]
-print(r)
-
 #[Ex-1]
 WT = []
 HT = []
 
 for i in range(100):
-    weight = random.uniform(40, 90)
-    height = random.randint(140, 200) * 0.01
+    weight = random.uniform(40, 90) #실수(floatf) 반환
+    height = random.randint(140, 200) * 0.01 #정수(int) 반환
     WT.append(weight)
     HT.append(height)
 
