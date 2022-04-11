@@ -38,7 +38,7 @@ height_weight_Data = df.loc[:, ['Height (Inches)', 'Weight (Pounds)']]
 stdscaler = preprocessing.StandardScaler()
 scaled_df = stdscaler.fit_transform(height_weight_Data)
 scaled_df = pd.DataFrame(scaled_df, columns=['Height (Inches)', 'Weight (Pounds)'])
-print(scaled_df)
+
 fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(6,5))
 
 ax1.set_title('Before Scaling')

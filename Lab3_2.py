@@ -16,9 +16,20 @@ df2.loc[df["Weight (Pounds)"]>400, "Weight (Pounds)"] = np.nan
 print("========= # total NAN =========")
 print(df2.isna().values.sum())
 
+# axis 관한 참고자료 : https://hogni.tistory.com/49 /
+# array([[8, 6, 9],
+#        [0, 1, 5],
+#        [7, 7, 8],
+#        [8, 4, 1],
+#        [2, 3, 2]]) 가 있다고 할 때
+# axis = 0 : 여기서 axis = 0은 무엇일까? 5,3 행렬에서 처음 5라고 생각하면되고, 다섯개의 원소를 죄다 더한다고 보면 된다.
+# np.sum(array, axis = 0)
+# array([25, 21, 25])
+
 # Print # of rows with NAN : nan이 있는 row의 총 개수
 print("========= # of rows with NAN =========")
-print(df2.isna().any(axis=1).sum())
+print(df2.isna().any(axis=0).sum())
+print(df2.head(20))
 
 print("#Print number of NAN for each column")
 print(df2.isna().sum())
