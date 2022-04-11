@@ -3,28 +3,48 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn import linear_model
 
-missing = ['-104.4205547', '592.6244266', '664.4877548',
-           '622.0486612','665.4650594','-130.9261617',
-           '1110.621115', '-161.9949135', '-141.8241248', '0']
+df = pd.read_csv("data/bmi_data_lab3.csv")
 
-df4 = pd.read_csv("data/bmi_data_lab3.csv", na_values=missing).dropna(axis=0)
+df2 = df.copy()
+df2.replace({"": np.nan})
+df2.loc[df["Height (Inches)"]<=0, "Height (Inches)"] = np.nan
+df2.loc[df["Height (Inches)"]>100, "Height (Inches)"] = np.nan
+df2.loc[df["Weight (Pounds)"]<=0, "Weight (Pounds)"] = np.nan
+df2.loc[df["Weight (Pounds)"]>400, "Weight (Pounds)"] = np.nan
 
-# Compute the linear regression equation E for (height, weight) values
-weight = np.array(df4['Weight (Pounds)'])
-height = np.array(df4['Height (Inches)'])
+# 이건 걍 총 개수
+print("========= # total NAN =========")
+print(df2.isna().values.sum())
 
-reg = linear_model.LinearRegression()
-reg.fit(height[:, np.newaxis], weight)
+# Print # of rows with NAN : nan이 있는 row의 총 개수
+print("========= # of rows with NAN =========")
+print(df2.isna().any(axis=1).sum())
 
-px = np.array([height.min() - 1, height.max() + 1])
-py = reg.predict(px[:, np.newaxis])
+print("#Print number of NAN for each column")
+print(df2.isna().sum())
 
-plt.title("#Compute linear regression equation")
-plt.xlabel('Height (inches)')
-plt.ylabel('Weight (pounds)')
+print("#All rows without NAN")
+print(df2.dropna(axis=0))
+print()
 
-plt.scatter(height, weight)
-plt.plot(px, py, color='k')
-plt.show()
+#Fill NAN with mean
+df3 = df2.copy()
+df3['Height (Inches)'].fillna(df['Height (Inches)'].mean(), inplace=True)
+df3['Weight (Pounds)'].fillna(df['Weight (Pounds)'].mean(), inplace=True)
+
+#Fill NAN with median
+df3 = df2.copy()
+df3['Height (Inches)'].fillna(df['Height (Inches)'].median(), inplace=True)
+df3['Weight (Pounds)'].fillna(df['Weight (Pounds)'].median(), inplace=True)
+
+#Use ffill
+df3 = df2.copy()
+df3.fillna(method='ffill', inplace=True)
+
+#Use bfill
+df3 = df2.copy()
+df3.fillna(method='bfill', inplace=True)
+
+
 
 
