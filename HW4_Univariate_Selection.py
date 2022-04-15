@@ -11,6 +11,7 @@ y = data.iloc[:, -2]
 X = data.iloc[: , 2:8]
 # convert categorical value into features
 categorical_feature = data.iloc[: , [-1]]
+
 encoder = OneHotEncoder(sparse=False)
 onehot = encoder.fit_transform(categorical_feature)
 categorical_ = pd.DataFrame(encoder.transform(categorical_feature),
@@ -22,6 +23,7 @@ new_X = new_X.fillna(0)
 bestfeatures = SelectKBest(score_func=chi2, k=10)
 fit = bestfeatures.fit(new_X, y)
 dfcolumns = pd.DataFrame(new_X.columns)
+
 dfscores = pd.DataFrame(fit.scores_)
 
 # concatenate two dataframes for better visualization

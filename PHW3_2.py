@@ -5,6 +5,8 @@ from sklearn import linear_model
 import seaborn as sns
 from sklearn import preprocessing
 
+
+
 # Find outlier people
 # Read the Excel dataset file,
 df = pd.read_excel('data/bmi_data_phw3.xlsx')
@@ -33,6 +35,7 @@ plt.show()
 #Compute e=w-w' (w’ is obtained for h using E)
 df_e = df.copy()
 df_e['ww'] = np.NaN
+df_e['e'] = np.NaN
 e = []
 
 for i in range(len(df_e)): #predict weight by height and store in dataframe
@@ -43,9 +46,10 @@ wp = df_e['ww']
 for i in range(len(df_e)): #compute e=w-w' than store
     e.append(weight[i]-wp[i])
 
-df_e['Weight (Pounds)'] = e
+df_e['e'] = e
+
 print('================== df_e ==================')
-print(df_e)
+print(df_e.head(50))
 print()
 
 #Normalize the e values
@@ -54,16 +58,13 @@ std = np.std(e) #standard deviation
 
 df_z = df.copy()
 df_z['z'] = np.NaN
+df_z['Original BMI'] = df_z['BMI']
 z = []
 
 for i in range(len(df_e)):
-    zz = (df_e['Weight (Pounds)'][i] - mean) / std
+    zz = (df_e['e'][i] - mean) / std
     df_z.loc[i, ['z']] = zz
     z.append(zz)
-
-df_z['Weight (Pounds)'] = z
-print('================== df_z ==================')
-print(df_z)
 
 #Plot a histogram showing the distribution of z
 plt.title('Data of all')
@@ -72,6 +73,8 @@ plt.show()
 
 #Decide a value α
 alpha = 1
-df_z.loc[df_z['Weight (Pounds)'] < -alpha, 'BMI'] = 0
-df_z.loc[df_z['Weight (Pounds)'] > alpha, 'BMI'] = 4
+df_z.loc[df_z['z'] < -alpha, 'BMI'] = 0
+df_z.loc[df_z['z'] > alpha, 'BMI'] = 4
 
+print('================== df_z ==================')
+print(df_z.head(50))
