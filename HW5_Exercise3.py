@@ -42,7 +42,7 @@ print("m : ", m)
 print(reg.coef_)
 print()
 
-print("=========기울기========")
+print("=========절편========")
 print("b : ", b)
 print(reg.intercept_)
 print()
