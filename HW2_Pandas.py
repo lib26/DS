@@ -31,12 +31,12 @@ print("---------dropna/axis=0---------") #가로
 print(df.dropna(axis=0, how='all'))
 print(df.dropna(axis=0, how='any'))
 print(df.dropna(axis=0, how='any', thresh=1))
-print(df.dropna(axis=0, how='any', thresh=2))
+print(df.dropna(axis=0, how='any', thresh=3))
 print("---------dropna/axis=1---------") #세로
 print(df.dropna(axis=1, how='all'))
 print(df.dropna(axis=1, how='any'))
 print(df.dropna(axis=1, how='any', thresh=1))
-print(df.dropna(axis=1, how='any', thresh=2))
+print(df.dropna(axis=1, how='any', thresh=3))
 print()
 
 # fillna with 100, mean, median
