@@ -5,7 +5,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
-# git test5
+# git test6
 # enter the data set
 trainDf = pd.read_csv("data/mnist_test.csv")
 
