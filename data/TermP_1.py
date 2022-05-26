@@ -22,7 +22,6 @@ plt.xticks(rotation = 40)
 plt.xlabel("Platform")
 plt.ylabel("The number of game")
 
-##Numerical Data
 #2. years - histogram
 plt.figure()
 plt.hist(df["Year_of_Release"],bins=8, rwidth=0.8)
@@ -50,6 +49,8 @@ plt.figure()
 sizes = [df['NA_Sales'].sum(), df['JP_Sales'].sum(), df['EU_Sales'].sum(), df['Other_Sales'].sum()]
 labels = "NA_Sales", "JP_Sales", "EU_Sales", "Other_Sales"
 plt.pie(sizes, labels=labels, autopct="%1.2f%%")
+
+print(df.iloc[:, 5:10].describe())
 
 #6. critical, user - histogram
 fig, (ax1,ax2,ax3,ax4) = plt.subplots(ncols=4, figsize=(14,5)) #show 4 graphs in one figure
