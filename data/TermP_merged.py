@@ -12,7 +12,115 @@ warnings.filterwarnings('ignore')
 
 pd.set_option('display.max_columns', 16) # to show all column
 
+
+# Data Inspection
+df = pd.read_csv("vgsales.csv")
+
+print("-----------------Inspection------------------")
+#1. platform - histogram
+print("\n--Platform--")
+print(df["Platform"].value_counts())
+
+plt.figure(figsize=[13,5])
+df["Platform"] = df["Platform"].astype(str)
+plt.hist(df["Platform"],bins = 32, rwidth=0.9)
+plt.title ("Platform")
+plt.xticks(rotation = 40)
+plt.xlabel("Platform")
+plt.ylabel("The number of game")
+
+#2. years - histogram
+plt.figure()
+plt.hist(df["Year_of_Release"],bins=8, rwidth=0.8)
+plt.title ("Years of Release")
+plt.xlabel("Years")
+plt.ylabel("The number of game")
+
+#3. Genre - histogram
+print("--------------Genre----------------")
+print(df["Genre"].value_counts())
+
+plt.figure(figsize=[13,5])
+df["Genre"] = df["Genre"].astype(str)
+plt.hist(df["Genre"],bins = 13, rwidth=0.9)
+plt.title ("Genre")
+plt.xlabel("Genre")
+plt.ylabel("The number of game")
+
+#4. publisher
+print("\n--publisher--")
+print(df["Publisher"].value_counts())
+
+#5. sales - piechart
+plt.figure()
+sizes = [df['NA_Sales'].sum(), df['JP_Sales'].sum(), df['EU_Sales'].sum(), df['Other_Sales'].sum()]
+labels = "NA_Sales", "JP_Sales", "EU_Sales", "Other_Sales"
+plt.pie(sizes, labels=labels, autopct="%1.2f%%")
+
+print(df.iloc[:, 5:10].describe())
+
+#6. critical, user - histogram
+fig, (ax1,ax2,ax3,ax4) = plt.subplots(ncols=4, figsize=(14,5)) #show 4 graphs in one figure
+ax1.set_title('Critic_Score')
+sns.distplot(df['Critic_Score'], kde=False,ax=ax1)
+
+ax2.set_title('Critic_Count')
+sns.distplot(df['Critic_Count'], kde=False,ax=ax2)
+
+ax3.set_title('User_Score')
+df['User_Score'] = np.where(df['User_Score']=='tbd',None,df['User_Score'])
+sns.distplot(df['User_Score'], kde=False,ax=ax3)
+
+ax4.set_title('User_Count')
+sns.distplot(df['User_Count'], kde=False,ax=ax4)
+#show a lot of null
+
+fig, (ax1,ax2,ax3,ax4) = plt.subplots(ncols=4, figsize=(14,5)) #show 4 graphs in one figure
+ax1.set_title('Critic_Score')
+a = df['Critic_Score'].value_counts().sum()
+b = df["Critic_Score"].isnull().sum()
+index = ["not null", "null"]
+sns.barplot(index, [a,b],tick_label=index,ax=ax1)
+
+ax2.set_title('Critic_Count')
+a = df['Critic_Count'].value_counts().sum()
+b = df["Critic_Count"].isnull().sum()
+index = ["not null", "null"]
+sns.barplot(index, [a,b],tick_label=index,ax=ax2)
+
+ax3.set_title('User_Score')
+a = df['User_Score'].value_counts().sum()
+b = df["User_Score"].isnull().sum()
+index = ["not null", "null"]
+sns.barplot(index, [a,b],tick_label=index,ax=ax3)
+
+ax4.set_title('User_Count')
+a = df['User_Count'].value_counts().sum()
+b = df["User_Count"].isnull().sum()
+index = ["not null", "null"]
+sns.barplot(index, [a,b],tick_label=index,ax=ax4)
+
+#7. developer - histogram
+print("\n--Developer--")
+print(df["Developer"].value_counts())
+
+#8. rating - pie chart
+print("\n-- rating--")
+print(df["Rating"].value_counts())
+print((df['Rating']=='E').count())
+plt.figure()
+sizes = [3991,2961,1563,1420,15]
+labels = "E", "T", "M", "E10+","etc."
+plt.pie(sizes, labels=labels, autopct="%1.2f%%")
+
+plt.show()
+
+
+
+
+# Data Preprocessing
 # data_type
+print("-----------------Preprocessing------------------")
 df = pd.read_csv("vgsales.csv")
 
 # Data exploration
@@ -160,6 +268,11 @@ print()
 # release final dataset
 df4.to_csv('cleaning_vgsales.csv', index=False, header=True)
 
+
+
+
+print("-----------------Analysis------------------")
+
 #DATA ANALYSIS
 
 from numpy import newaxis
@@ -176,9 +289,9 @@ definition : enter the data and make the result of trained model which is the fr
 def GBR(X,y):
 
     regressor = GradientBoostingRegressor(
-        max_depth=3,
-        n_estimators=100,
-        learning_rate=1
+        max_depth=5,
+        n_estimators=500,
+        learning_rate=1.0
     )
     regressor = regressor.fit(X, y)
     return regressor
@@ -199,23 +312,24 @@ def KNN(X,y, n):
 newGame = pd.DataFrame({"Global_Sales": np.nan, "NA_Sales": np.nan, "EU_Sales":10}, index=[0])
 print("data that will predict: ")
 print(newGame)
+print()
 
-# change the form of the columns for scaling
-eu_sales = np.array(newGame.loc[:, ['EU_Sales']]).reshape(-1)
-
-#scaling the newGame's EU_Sales
-scaled_eu_sales = Scaler.transform(eu_sales[:, np.newaxis]).reshape(-1)
-
+#scaling newGame
+SC = StandardScaler()
+SC.fit(EU_Sales[:, np.newaxis])
+newGame_EU_Sales = np.array(newGame.loc[:, ['EU_Sales']]).reshape(-1)
+scaled_newGame = SC.transform(newGame_EU_Sales[:, np.newaxis]).reshape(-1)
 
 # input the scaled data into newGame
 newGame = pd.DataFrame({
     "Global_Sales": np.nan,
     "NA_Sales": np.nan,
-    "EU_Sales": scaled_eu_sales
+    "EU_Sales": scaled_newGame
 })
 
 print("after scaling of the new game")
 print(newGame)
+print()
 
 #run the model to predict NA_Sales
 X = df4.drop(columns=["Global_Sales","NA_Sales"])
@@ -232,15 +346,18 @@ reg_NA_Sales = GBR(X_train,y_train)
 #score of the predicting NA_Sales before hyperParameter
 print("score of the predict NA_Sales: ")
 print(reg_NA_Sales.score(X_test, y_test))
+print()
 
 #prediction of the User_Score
 print("prediction of the NA_Sales of the newGame: ")
 print(reg_NA_Sales.predict(newGameX))
+print()
 
 #setting the newGame's NA_Sales
 newGame["NA_Sales"] = reg_NA_Sales.predict(newGameX)
 print("current newGame status(No Global_Sales yet) : ")
 print(newGame)
+print()
 
 #Traing the model based on the EU_Sales, NA_Sales and predict the Global Sales
 X = df4.drop(columns=["Global_Sales"])
@@ -257,15 +374,18 @@ reg_Global_Sales = GBR(X_train,y_train)
 #score of the predicting Global_Sales before hyperParameter
 print("score of the predict Global_Sales: ")
 print(reg_Global_Sales.score(X_test, y_test))
+print()
 
 #prediction of the Global_Sales
 print("prediction of the Global_Sales of the newGame: ")
 print(reg_Global_Sales.predict(newGameX))
+print()
 
 #setting the newGame's Global_Sales
 newGame["Global_Sales"] = reg_Global_Sales.predict(newGameX)
 print("current newGame status: ")
 print(newGame)
+print()
 
 #add the IsSuccess colunm for predict the game is whether success or not
 cutoff = df4["Global_Sales"].mean()*1.5
@@ -274,15 +394,15 @@ cutoff = df4["Global_Sales"].mean()*1.5
 #and show the data frame which added the isSuccess column
 df4['IsSuccess'] = ["success" if s >= cutoff else "failure" for s in df4['Global_Sales']]
 print(df4)
+print()
 
 #execute model
 knn_X = df4[["Global_Sales","NA_Sales","EU_Sales"]]
 knn_y = df4["IsSuccess"]
 
 
-#newGame
-newGameX = newGame[["Global_Sales","NA_Sales","EU_Sales"]]
 
+newGameX = newGame[["Global_Sales","NA_Sales","EU_Sales"]]
 #split the data for knn
 knn_X_train, knn_X_test, knn_y_train, knn_y_test = train_test_split(knn_X, knn_y, test_size=.2,
                                                         random_state=1,
@@ -294,6 +414,7 @@ knn = KNN(knn_X_train,knn_y_train, 5)
 #KNN score
 print("knn score: ")
 print(knn.score(knn_X_test,knn_y_test))
+print()
 
 #setting the newGame's isSuccess
 newGame["IsSuccess"] = knn.predict(newGameX)
@@ -302,6 +423,12 @@ newGame["IsSuccess"] = knn.predict(newGameX)
 print("Result before hyperParameter")
 print("newGame will be ",end="")
 print(newGame["IsSuccess"].values)
+print()
+
+
+
+
+print("-----------------Evaluation------------------")
 
 #EVALUATION
 
@@ -319,13 +446,10 @@ newGame = pd.DataFrame({
 #hyperParameter work for predicting NA_Sales
 X = df4.drop(columns=["Global_Sales","NA_Sales","IsSuccess"])
 y = df4["NA_Sales"]
-
-
 #split X_train, X_test, y_train, y_test
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2,
                                                         random_state=1,
                                                         shuffle=True)
-
 #setting the grid of the hyperParameters
 parameters = {'learning_rate': [0.1, 0.2, 0.3, 0.4],
               'n_estimators': [50, 100, 300, 500, 1000, 1500],
@@ -339,6 +463,7 @@ print(" Results from grid_GBR_NA_Sales ")
 print("\n The best estimator: \n", grid_GBR_NA_Sales.best_estimator_)
 print("\n The best score during all parameters: \n", grid_GBR_NA_Sales.best_score_)
 print("\n The best parameters: \n", grid_GBR_NA_Sales.best_params_)
+print()
 
 #Setting the NA_Sales from the hyperParameter processed model
 newGameX = newGame.drop(columns=["Global_Sales","NA_Sales"])
@@ -347,6 +472,7 @@ newGame['NA_Sales'] = grid_GBR_NA_Sales.predict(newGameX)
 #current newGame status
 print("current newGame status include predicted NA_Sales by the hyperparmeterd model")
 print(newGame)
+print()
 
 #hyperParameter work for Global_sales
 X = df4.drop(columns=["Global_Sales","IsSuccess"])
@@ -358,9 +484,9 @@ newGameX = newGame.drop(columns=["Global_Sales"])
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2,
                                                         random_state=1,
                                                         shuffle=True)
-parameters = {'learning_rate': [0.1, 0.2, 0.3, 0.4, 1.0],
-              'n_estimators': [100, 500, 1000, 1500],
-              'max_depth': [2, 4, 6, 8]
+parameters = {'learning_rate': [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1],
+              'n_estimators': [30, 40, 50, 60, 70, 80, 90, 100, 500],
+              'max_depth': [2, 3, 4, 5, 6]
               }
 grid_GBR_Global_Sales = GridSearchCV(estimator=reg_Global_Sales, param_grid=parameters, cv = 3, n_jobs=-1)
 grid_GBR_Global_Sales.fit(X_train, y_train)
@@ -370,6 +496,7 @@ print(" Results from grid_GBR_Global_Sales ")
 print("\n The best estimator: \n", grid_GBR_Global_Sales.best_estimator_)
 print("\n The best score during all parameters: \n", grid_GBR_Global_Sales.best_score_)
 print("\n The best parameters: \n", grid_GBR_Global_Sales.best_params_)
+print()
 
 #Setting the Global Sales by the hyperParameter processed model
 newGameX = newGame.drop(columns=['Global_Sales'])
@@ -378,6 +505,7 @@ newGame['Global_Sales'] = grid_GBR_Global_Sales.predict(newGameX)
 #current newGame status
 print("current newGame status include predicted Global_Sales by the hyperparmeterd model")
 print(newGame)
+print()
 
 #evaluate the KNN by confusion matrix
 cm = confusion_matrix(knn_y_test,knn.predict(knn_X_test))
@@ -391,6 +519,7 @@ plt.show()
 #accuracy of the confusion matrix
 print("precision, recall, f1_score of the confusion matrix which composed with KNN: ")
 print(classification_report(knn_y_test, knn.predict(knn_X_test)))
+print()
 
 #newGame
 newGameX = newGame[["Global_Sales","NA_Sales","EU_Sales"]]
@@ -402,3 +531,5 @@ newGame["IsSuccess"] = knn.predict(newGameX)
 print("Result after hyperParameter")
 print("newGame will be ",end="")
 print(newGame["IsSuccess"].values)
+
+print("End")
